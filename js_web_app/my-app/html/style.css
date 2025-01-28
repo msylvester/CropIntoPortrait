@@ -1,0 +1,31 @@
+.floating-box {
+  background-color: #29e;
+  color: white;
+  font-size: 20px;
+  font-family: sans-serif;
+  border-radius: 8px;
+  padding: 15px;
+  margin: 30px 20px;
+  touch-action: none;
+  user-select: none;
+  width: 120px;
+  bottom: 0;
+
+  /* This makes things *much* easier */
+  box-sizing: border-box;
+  /* z-index: 1; */
+
+  position: absolute;
+}
+
+video {
+  z-index: 0;
+}
+
+.content {
+  /* height: 240px; */
+  /* border: 1px solid red; */
+  display: inline-block;
+  position: relative;
+  /* width: auto; */
+}
