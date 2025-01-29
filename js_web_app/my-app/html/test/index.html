@@ -31,8 +31,8 @@
             padding: 0;
             touch-action: none;
             user-select: none;
-            width: 120px;
-            height: 80px;
+            width: 90px;
+            height: 160px;
             box-sizing: border-box;
             position: absolute;
             top: 20px;
@@ -50,13 +50,34 @@
         #preview-canvas {
             border: 1px solid #29e;
         }
+
+        .export-btn {
+            display: block;
+            margin-top: 10px;
+            padding: 8px 16px;
+            background-color: #29e;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .export-btn:hover {
+            background-color: #18d;
+        }
+
+        #progress {
+            margin-top: 10px;
+            display: none;
+        }
     </style>
 </head>
 <body>
     <section class="content">
         <div class="video-container">
             <video id="main-video" class="main-video" controls>
-                <source src="https://live-par-2-abr.livepush.io/vod/bigbuckbunnyclip.mp4" type="video/mp4">
+                <source src="./800_ten_second.mp4" type="video/mp4">
                 Video not supported.
             </video>
             <div id="crop-box" class="floating-box"></div>
@@ -65,6 +86,8 @@
         <div class="preview-container">
             <h3>Preview</h3>
             <canvas id="preview-canvas"></canvas>
+            <button id="export-btn" class="export-btn">Export Video</button>
+            <div id="progress">Processing: <span id="progress-value">0</span>%</div>
         </div>
     </section>
 
@@ -73,11 +96,23 @@
         const video = document.getElementById('main-video');
         const cropBox = document.getElementById('crop-box');
         const previewCanvas = document.getElementById('preview-canvas');
+        const exportBtn = document.getElementById('export-btn');
+        const progressDiv = document.getElementById('progress');
+        const progressValue = document.getElementById('progress-value');
         const ctx = previewCanvas.getContext('2d');
 
-        // Set initial preview canvas size
-        previewCanvas.width = 320;
-        previewCanvas.height = 180;
+        // Add state object to track dimensions
+        const cropState = {
+            width: 90,
+            height: 160,
+            x: 20,
+            y: 20,
+            aspectRatio: (90/160).toFixed(2)
+        };
+
+        // Set initial preview canvas size to 9:16 ratio
+        previewCanvas.width = 270;  // Base width
+        previewCanvas.height = 480; // 16:9 of the width
 
         function updatePreview() {
             if (video.paused || video.ended) return;
@@ -116,6 +151,83 @@
             requestAnimationFrame(updatePreview);
         }
 
+        async function exportCroppedVideo() {
+            const outputCanvas = document.createElement('canvas');
+            const outputCtx = outputCanvas.getContext('2d');
+            
+            // Set output canvas dimensions based on crop box
+            outputCanvas.width = cropState.width;
+            outputCanvas.height = cropState.height;
+
+            // Create MediaRecorder
+            const stream = outputCanvas.captureStream();
+            const mediaRecorder = new MediaRecorder(stream, {
+                mimeType: 'video/webm;codecs=h264',
+                videoBitsPerSecond: 2500000 // 2.5 Mbps
+            });
+
+            const chunks = [];
+            mediaRecorder.ondataavailable = (e) => chunks.push(e.data);
+            
+            mediaRecorder.onstop = () => {
+                const blob = new Blob(chunks, { type: 'video/webm' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'cropped-video.webm';
+                a.click();
+                URL.revokeObjectURL(url);
+                progressDiv.style.display = 'none';
+            };
+
+            // Start recording
+            mediaRecorder.start();
+
+            // Process the video
+            video.currentTime = 0;
+            progressDiv.style.display = 'block';
+
+            const processFrame = async () => {
+                const rect = cropBox.getBoundingClientRect();
+                const videoRect = video.getBoundingClientRect();
+                
+                // Calculate relative position and scale
+                const x = (rect.left - videoRect.left) * (video.videoWidth / videoRect.width);
+                const y = (rect.top - videoRect.top) * (video.videoHeight / videoRect.height);
+                const width = rect.width * (video.videoWidth / videoRect.width);
+                const height = rect.height * (video.videoHeight / videoRect.height);
+
+                // Draw the frame
+                outputCtx.drawImage(
+                    video,
+                    x, y, width, height,
+                    0, 0, outputCanvas.width, outputCanvas.height
+                );
+
+                // Update progress
+                const progress = Math.floor((video.currentTime / video.duration) * 100);
+                progressValue.textContent = progress;
+
+                if (video.currentTime < video.duration) {
+                    video.currentTime += 1/30; // Process at 30fps
+                    await new Promise(resolve => setTimeout(resolve, 1000/30));
+                    await processFrame();
+                } else {
+                    mediaRecorder.stop();
+                }
+            };
+
+            try {
+                await processFrame();
+            } catch (error) {
+                console.error('Error processing video:', error);
+                progressDiv.style.display = 'none';
+            }
+        }
+
+        // Export button click handler
+        exportBtn.addEventListener('click', exportCroppedVideo);
+
         // Start preview when video plays
         video.addEventListener('play', () => {
             updatePreview();
@@ -142,7 +254,16 @@
                         outer: 'parent'
                     }),
                     interact.modifiers.restrictSize({
-                        min: { width: 100, height: 50 }
+                        min: { width: 90, height: 160 }
+                    }),
+                    // Force 9:16 aspect ratio
+                    interact.modifiers.aspectRatio({
+                        ratio: 9/16,
+                        modifiers: [
+                            interact.modifiers.restrictSize({
+                                min: { width: 90, height: 160 }
+                            })
+                        ]
                     })
                 ],
                 inertia: true,
@@ -156,6 +277,10 @@
             const x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
             const y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
 
+            // Update state
+            cropState.x = x;
+            cropState.y = y;
+
             target.style.transform = `translate(${x}px, ${y}px)`;
             target.setAttribute('data-x', x);
             target.setAttribute('data-y', y);
@@ -168,10 +293,17 @@
 
             target.style.width = event.rect.width + 'px';
             target.style.height = event.rect.height + 'px';
-
+            
             x += event.deltaRect.left;
             y += event.deltaRect.top;
 
+            // Update state
+            cropState.width = event.rect.width;
+            cropState.height = event.rect.height;
+            cropState.x = x;
+            cropState.y = y;
+            cropState.aspectRatio = (event.rect.width / event.rect.height).toFixed(2);
+         
             target.style.transform = `translate(${x}px, ${y}px)`;
             target.setAttribute('data-x', x);
             target.setAttribute('data-y', y);
