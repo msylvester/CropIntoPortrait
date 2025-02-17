@@ -1,57 +1,54 @@
 'use client'
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
-const SAMPLE_VIDEOS = [
-  "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
-  "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
-  "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
-  "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4"
-];
+interface GeneratorState {
+  isLoading: boolean;
+  generatedVideos: string[];
+}
 
 const VideoClipGenerator = () => {
-  // Move useState inside useEffect to avoid hydration mismatch
-  const [state, setState] = useState({
+  const [url, setUrl] = useState('');
+  const [state, setState] = useState<GeneratorState>({
     isLoading: false,
     generatedVideos: [],
   });
 
-  // Handle client-side initialization
-  useEffect(() => {
-    // Initialize state on client side only
-    setState({
-      isLoading: false,
-      generatedVideos: [],
-    });
-  }, []);
-
   const handleGenerate = async () => {
+    if (!url) {
+      alert('Please enter a video URL');
+      return;
+    }
+
     setState(prev => ({ ...prev, isLoading: true }));
     
     try {
-      // Simulate API call with a short delay
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      // Get 3 random videos
-      const shuffled = [...SAMPLE_VIDEOS].sort(() => 0.5 - Math.random());
-      const selectedVideos = shuffled.slice(0, 3);
+      const response = await fetch('http://localhost:5001/api/process-video', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ url }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to process video');
+      }
+
+      const data = await response.json();
+      const parsedOutput = JSON.parse(data.output);
       
       setState(prev => ({
         ...prev,
-        generatedVideos: selectedVideos,
+        generatedVideos: parsedOutput.videos,
         isLoading: false,
       }));
     } catch (error) {
-      console.error('Error generating clips:', error);
-      alert('Failed to generate clips. Please try again.');
+      console.error('Error processing video:', error);
+      alert('Failed to process video. Please try again.');
       setState(prev => ({ ...prev, isLoading: false }));
     }
   };
-
-  // Early return while component is hydrating
-  if (typeof window === 'undefined') {
-    return <div className="min-h-screen bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 p-4" />;
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 p-4">
@@ -63,6 +60,23 @@ const VideoClipGenerator = () => {
           </h1>
           
           <div className="space-y-6">
+            <div className="space-y-2">
+              <label 
+                htmlFor="videoUrl" 
+                className="block text-sm font-medium text-gray-700"
+              >
+                Video URL
+              </label>
+              <input
+                id="videoUrl"
+                type="url"
+                placeholder="Enter your video URL here"
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition-all duration-200"
+              />
+            </div>
+
             <button
               onClick={handleGenerate}
               disabled={state.isLoading}
@@ -81,10 +95,10 @@ const VideoClipGenerator = () => {
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
-                  <span>Generating...</span>
+                  <span>Processing...</span>
                 </div>
               ) : (
-                'Generate Random Clips'
+                'Process Video'
               )}
             </button>
           </div>
@@ -96,7 +110,7 @@ const VideoClipGenerator = () => {
             <h2 className="text-2xl font-bold text-gray-800 mb-6">
               Generated Clips
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {state.generatedVideos.map((videoUrl, index) => (
                 <div key={index} className="rounded-lg overflow-hidden shadow-lg">
                   <video
