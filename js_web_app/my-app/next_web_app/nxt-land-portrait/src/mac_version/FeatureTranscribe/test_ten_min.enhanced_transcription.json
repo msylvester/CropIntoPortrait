@@ -1,0 +1,434 @@
+[
+  {
+    "start": 0.0,
+    "end": 23.0,
+    "text": "That is a little bit different or different enough from kind of kind of just creating just picking out the best clips from it. So that's why I think that's why I think. You know, I'll be pursuing the former right like I'll be pursuing what we've you know worked on when we have kind of a POC for which is just every, you know, every 10 second best 10 second clips.",
+    "audio_features": {
+      "volume": {
+        "level": "loud",
+        "value": 746.7326965332031
+      },
+      "characteristics": {
+        "intensity": "high",
+        "zero_crossing_rate": 0.18251861315561602,
+        "spectral_centroid": 2164.741833822518
+      }
+    }
+  },
+  {
+    "start": 23.0,
+    "end": 38.0,
+    "text": "But actually the latter the idea of creating an amalgamation or a best, you know, a clip generated a viral clip generated from from a given 30 minute or two hour VOD.",
+    "audio_features": {
+      "volume": {
+        "level": "loud",
+        "value": 694.697021484375
+      },
+      "characteristics": {
+        "intensity": "normal",
+        "zero_crossing_rate": 0.1591203441497868,
+        "spectral_centroid": 1925.289457790794
+      }
+    }
+  },
+  {
+    "start": 38.0,
+    "end": 57.0,
+    "text": "You know, but as an amalgamation rather than just segments of it. It's kind of like two different approaches, but we'll be going with with the former. Vega, what's going on here to check this out? Did you see in discord what I posted here? Oh, the other thing I wanted to check on discord too was Dylan posted a pretty cool link that I wanted to look on on stream. I'm remote.",
+    "audio_features": {
+      "volume": {
+        "level": "loud",
+        "value": 762.7549133300781
+      },
+      "characteristics": {
+        "intensity": "high",
+        "zero_crossing_rate": 0.1757867354166184,
+        "spectral_centroid": 2049.5367149507656
+      }
+    }
+  },
+  {
+    "start": 57.0,
+    "end": 81.0,
+    "text": "Shit, Jesus Christ. Oops. But I wanted to show us this. Matthew, did you see this? This one viral yesterday. This is the creator of soon. Vega and he's like he's talking about the current. He's talking about he's shooting on like musicians.",
+    "audio_features": {
+      "volume": {
+        "level": "loud",
+        "value": 437.2358512878418
+      },
+      "characteristics": {
+        "intensity": "high",
+        "zero_crossing_rate": 0.1971975886704327,
+        "spectral_centroid": 2572.5689367168875
+      }
+    }
+  },
+  {
+    "start": 81.0,
+    "end": 102.0,
+    "text": "In fact, no, not quite that here. I'll achieve this in a time. Tell me what you think. I don't know where maybe you saw if you saw this, then like whatever is I'm not going to play against. I've already played it twice. But it's pretty short. The prop of creators 10% faster or makes it 10% easier to make music. If you want to impact the way a billion people experience music, you have to build something for a billion people.",
+    "audio_features": {
+      "volume": {
+        "level": "loud",
+        "value": 1562.4735717773438
+      },
+      "characteristics": {
+        "intensity": "normal",
+        "zero_crossing_rate": 0.1389434181601411,
+        "spectral_centroid": 1809.764125404332
+      }
+    }
+  },
+  {
+    "start": 102.0,
+    "end": 130.0,
+    "text": "And so that is first and foremost, giving everybody the joy of creating music. And this is a huge departure from how it is now. It's not really enjoyable to make music now. People enjoy it. It takes a lot of time. It takes a lot of practice. You need to get really good at an instrument or really good at a piece of production software. I think the majority of people don't enjoy the majority of the time they spend making music.",
+    "audio_features": {
+      "volume": {
+        "level": "loud",
+        "value": 3396.2738037109375
+      },
+      "characteristics": {
+        "intensity": "normal",
+        "zero_crossing_rate": 0.10357413060086218,
+        "spectral_centroid": 1523.081573853975
+      }
+    }
+  },
+  {
+    "start": 130.0,
+    "end": 159.0,
+    "text": "Do you not think that's like running? It is hard to run. It is painful to run. You don't particularly enjoy it, but you love running. And you get good at it and you get better at it and you speak to the runners and they love front. Most people drop out of that pursuit because it was hard. And so I think that the people that you know that run, this is a highly biased selection of the population that fell in love with it.",
+    "audio_features": {
+      "volume": {
+        "level": "loud",
+        "value": 2908.989013671875
+      },
+      "characteristics": {
+        "intensity": "normal",
+        "zero_crossing_rate": 0.0971124238560398,
+        "spectral_centroid": 1438.135587469369
+      }
+    }
+  },
+  {
+    "start": 159.0,
+    "end": 177.0,
+    "text": "So you did see this. You did see this. You did see this clip before I just played it. Yeah, yeah, this is, yeah, it's crazy. It's fucking wild that he said it. I mean, what? Okay, well, let me ask you question. So, so he's full of shit.",
+    "audio_features": {
+      "volume": {
+        "level": "loud",
+        "value": 620.7783203125
+      },
+      "characteristics": {
+        "intensity": "high",
+        "zero_crossing_rate": 0.19540474222817197,
+        "spectral_centroid": 2644.515496800199
+      }
+    }
+  },
+  {
+    "start": 177.0,
+    "end": 196.0,
+    "text": "Bird said, Birdbot says, he says what do we can to get more cash? Okay. Is he like trying to be a heal? Like, you know, like he's trying to be a bad guy. So it gets reshared. Because that worked. Like people did reshare it and all that. Like, you know what I'm saying? Like, or does he, you think he actually just misspoke or like do you think he?",
+    "audio_features": {
+      "volume": {
+        "level": "loud",
+        "value": 1033.1696472167969
+      },
+      "characteristics": {
+        "intensity": "high",
+        "zero_crossing_rate": 0.18687246626585408,
+        "spectral_centroid": 2287.311737380134
+      }
+    }
+  },
+  {
+    "start": 196.0,
+    "end": 216.0,
+    "text": "Like, you know what I mean? Like was trying to get reshared because he knew that would piss people off. Like, AI music, AI art. These are like delicate topics. Right? Like in the sense of. In a sense of the has it's like, has its detractors or has people that like get kind of personal about it. I know for me personally, like with coding.",
+    "audio_features": {
+      "volume": {
+        "level": "loud",
+        "value": 907.4389953613281
+      },
+      "characteristics": {
+        "intensity": "high",
+        "zero_crossing_rate": 0.1871489991014377,
+        "spectral_centroid": 2302.1810014796756
+      }
+    }
+  },
+  {
+    "start": 216.0,
+    "end": 245.0,
+    "text": "Like, I'm kind of over it now here. I got to show you guys something else too. I know me personally, like myself. I got like, I get like a little nervous about like the AI coding bots and all that. Not not like, okay, not so much right now. But then at first it was like a little overwhelming because like it attacked my pocketbook, right? Like the easier it is for this bot to write code. The less valuable it is that I spent years writing code professionally. Right? Like, so like with music with art. These kind of thoughts coming to people's head.",
+    "audio_features": {
+      "volume": {
+        "level": "loud",
+        "value": 1054.9947204589844
+      },
+      "characteristics": {
+        "intensity": "high",
+        "zero_crossing_rate": 0.17830610969432392,
+        "spectral_centroid": 2103.641421145619
+      }
+    }
+  },
+  {
+    "start": 245.0,
+    "end": 266.0,
+    "text": "And so like, I don't know if he's saying that specifically to be inflammatory and then get reshared and all that. Or if like maybe there's like another reason that like I can't quite figure out here. I got to show you guys this. This is pretty wild. So let me see if I can find it though because I may not be able to.",
+    "audio_features": {
+      "volume": {
+        "level": "loud",
+        "value": 675.9745330810547
+      },
+      "characteristics": {
+        "intensity": "high",
+        "zero_crossing_rate": 0.1708892514425344,
+        "spectral_centroid": 2232.939582462547
+      }
+    }
+  },
+  {
+    "start": 268.0,
+    "end": 293.0,
+    "text": "So somebody had a crazy DMM I can be able to find it very easily. One more. Okay, I'm going to try my best to find this tweet. It was fucking wild dog. And I don't think I'm going to be able to do it. But I guess I don't know if this is a true story here. Let me second find it.",
+    "audio_features": {
+      "volume": {
+        "level": "loud",
+        "value": 285.6323076883952
+      },
+      "characteristics": {
+        "intensity": "normal",
+        "zero_crossing_rate": 0.14822618904702098,
+        "spectral_centroid": 2297.1844971201826
+      }
+    }
+  },
+  {
+    "start": 293.0,
+    "end": 308.0,
+    "text": "So I guess meta announced that they're not going to be hiring mid level devs. Meta announces not hiring junior devs. And they're just going to use AI. Let's see. Let's see.",
+    "audio_features": {
+      "volume": {
+        "level": "loud",
+        "value": 522.5769653320312
+      },
+      "characteristics": {
+        "intensity": "high",
+        "zero_crossing_rate": 0.16439416377628518,
+        "spectral_centroid": 2146.8489071014783
+      }
+    }
+  },
+  {
+    "start": 312.0,
+    "end": 343.0,
+    "text": "What was this? Middle level software. Like, here's the thing though. Here's the thing. Here's the thing. Like mid software or like June, this idea of junior level devs. Like junior level devs were never, were never a thing. Really. But I mean, I've never, I've never worked at a company that hired junior devs. Like, it was never really a big thing. You know, like maybe Google would hire some, but like, they were never like job. Like, I never saw a lot of jobs for junior level. It was never like a huge thing. You know, like.",
+    "audio_features": {
+      "volume": {
+        "level": "loud",
+        "value": 621.8351338704427
+      },
+      "characteristics": {
+        "intensity": "high",
+        "zero_crossing_rate": 0.15387084545100385,
+        "spectral_centroid": 2202.2145939245747
+      }
+    }
+  },
+  {
+    "start": 344.0,
+    "end": 370.0,
+    "text": "And think about it from a perspective. Like you're a company. You're hiring. You're, you're hiring. Like you want somebody with a specifically computer science. And I'm not speaking about today because today, like, I really don't know specifically what it's like. But just a couple of years ago, like whenever we were hiring, you're looking for a very specific skill set. Can he code and react? Does he know Redux? Does he know Flux? Does he know this particular API that we use? How is he a good MongoDB? Like, you really need to know.",
+    "audio_features": {
+      "volume": {
+        "level": "loud",
+        "value": 944.6201782226562
+      },
+      "characteristics": {
+        "intensity": "high",
+        "zero_crossing_rate": 0.17904951272918335,
+        "spectral_centroid": 2170.1372078079876
+      }
+    }
+  },
+  {
+    "start": 370.0,
+    "end": 386.0,
+    "text": "That like, you really need to know the skill, like that they have a certain skill. That's why you're paying them. You're not paying them to learn. You're paying them because you, you know, you actually generally speaking, like when you hire somebody, you no longer want to do to the work. You want to like somebody else to do it, right? So it's like, you're that.",
+    "audio_features": {
+      "volume": {
+        "level": "loud",
+        "value": 1027.209228515625
+      },
+      "characteristics": {
+        "intensity": "high",
+        "zero_crossing_rate": 0.17226094685628743,
+        "spectral_centroid": 2105.7763916335466
+      }
+    }
+  },
+  {
+    "start": 386.0,
+    "end": 407.0,
+    "text": "So junior doves never really made a lot of sense, you know, like, it never really made a lot of sense in computer, like in software and now Google Facebook, they would hire people out of college who passed all those. And you know, I'm not really speaking to that as much. I mean, they have so many resources. But even like when all the jobs that I, I software AWS, like none of these were like very junior junior themed, you know.",
+    "audio_features": {
+      "volume": {
+        "level": "loud",
+        "value": 1013.3240051269531
+      },
+      "characteristics": {
+        "intensity": "high",
+        "zero_crossing_rate": 0.17398013695891806,
+        "spectral_centroid": 2149.1458864375686
+      }
+    }
+  },
+  {
+    "start": 407.0,
+    "end": 439.0,
+    "text": "Anyway, so that was a crazy story. I want to check that Dylan link. So he posted it and miss. I think I didn't read this yet. But let's just take a look at it. The future of corporate leadership. So what was, what was this Dylan? What was this? The, when I read this, now I didn't get a chance to read the whole thing. So upgrade your CEO to a I CEO featuring guaranteed kills. Or is this like a meme?",
+    "audio_features": {
+      "volume": {
+        "level": "loud",
+        "value": 623.0619049072266
+      },
+      "characteristics": {
+        "intensity": "high",
+        "zero_crossing_rate": 0.1882053580614244,
+        "spectral_centroid": 2384.2006095063653
+      }
+    }
+  },
+  {
+    "start": 439.0,
+    "end": 462.0,
+    "text": "Replace your CEO right now. Oh, it was on Harvard Business Review as popularized by HBR. So this is not a meme or else this is a meme. HBR is Harvard Business Review. I've written an article for them like in 2017. I used to read. I was like a huge reader. I was like on the review staff to like I used to love that product. I haven't looked at it for a couple of years.",
+    "audio_features": {
+      "volume": {
+        "level": "loud",
+        "value": 607.5446624755859
+      },
+      "characteristics": {
+        "intensity": "high",
+        "zero_crossing_rate": 0.16282867476941335,
+        "spectral_centroid": 2072.715048257176
+      }
+    }
+  },
+  {
+    "start": 463.0,
+    "end": 481.0,
+    "text": "I used to be a Harvard Business Review like future reviewer. Why I see a performance human leadership. So I mean, like some of their products. I like there's a range of products that they, you know, review, speak, speak, you know, well about like they're not all great or whatever.",
+    "audio_features": {
+      "volume": {
+        "level": "loud",
+        "value": 736.7154083251953
+      },
+      "characteristics": {
+        "intensity": "high",
+        "zero_crossing_rate": 0.1713555994671474,
+        "spectral_centroid": 2122.058077691361
+      }
+    }
+  },
+  {
+    "start": 481.0,
+    "end": 496.0,
+    "text": "But I do think it's kind of interesting. So this is a, um, AICO outperforms human leadership. Now this I kind of believe evolution of corporate AI leadership AI intern pH. What is this? Is this real? AICO.",
+    "audio_features": {
+      "volume": {
+        "level": "loud",
+        "value": 830.5613708496094
+      },
+      "characteristics": {
+        "intensity": "high",
+        "zero_crossing_rate": 0.16965724412013475,
+        "spectral_centroid": 2053.2356706463706
+      }
+    }
+  },
+  {
+    "start": 498.0,
+    "end": 513.0,
+    "text": "What is this graph? Look at this graph. Homies. That should be a fucking emoji. This is not this is a meme. I don't think don'ts here. But I think this is a meme.",
+    "audio_features": {
+      "volume": {
+        "level": "loud",
+        "value": 452.38657633463544
+      },
+      "characteristics": {
+        "intensity": "high",
+        "zero_crossing_rate": 0.15670969716014935,
+        "spectral_centroid": 2358.9408108034077
+      }
+    }
+  },
+  {
+    "start": 513.0,
+    "end": 539.0,
+    "text": "AICO control panel PR crisis notion employee satisfaction shareholder value AI confidence. Listen, I know D&D means a lot to some yet. It's definitely a meme. Uh, magic gathering still means a lot to me that being said, if AICO buys has brought runs in the round that would be very funny to me. If AI, if AICO is now a member of the American government is exit security for other nations. This is really funny.",
+    "audio_features": {
+      "volume": {
+        "level": "loud",
+        "value": 415.3479817708333
+      },
+      "characteristics": {
+        "intensity": "high",
+        "zero_crossing_rate": 0.17224946874007716,
+        "spectral_centroid": 2215.873658081988
+      }
+    }
+  },
+  {
+    "start": 539.0,
+    "end": 559.0,
+    "text": "Thank you, God for keeping AICO out of California. $3,000 for an AICO. That seems like a fair deal. Guys, what do you think?",
+    "audio_features": {
+      "volume": {
+        "level": "loud",
+        "value": 279.5439453125
+      },
+      "characteristics": {
+        "intensity": "normal",
+        "zero_crossing_rate": 0.14518292986762057,
+        "spectral_centroid": 2468.7546501553843
+      }
+    }
+  },
+  {
+    "start": 559.0,
+    "end": 588.0,
+    "text": "$3,000 a month. I mean CEO bonuses are huge. You know? Yeah, AICO for startup 15,000. Isn't AI just isn't AI just a tool to augment workers now replace them. Of course, CEO is not a mere worker, but a leader in a world of a company.",
+    "audio_features": {
+      "volume": {
+        "level": "loud",
+        "value": 558.4129486083984
+      },
+      "characteristics": {
+        "intensity": "normal",
+        "zero_crossing_rate": 0.14622436230981053,
+        "spectral_centroid": 2359.635661416476
+      }
+    }
+  },
+  {
+    "start": 588.0,
+    "end": 601.0,
+    "text": "Agent as an aspect uses agent brain agent agent is this a was this a word they got a Chanuk brain agent agent tick brain. I don't think so. Sounds hilarious. So.",
+    "audio_features": {
+      "volume": {
+        "level": "loud",
+        "value": 325.712158203125
+      },
+      "characteristics": {
+        "intensity": "high",
+        "zero_crossing_rate": 0.17534237816220238,
+        "spectral_centroid": 2270.3491339132306
+      }
+    }
+  }
+]

@@ -1,0 +1,18 @@
+[
+  {
+    "start": 0.0,
+    "end": 15.08,
+    "text": "God dude. Oh dude, I was- Oh thanks for the follow, thanks for the follow. Dude, I was just about to expose my opening eye. Sir, that shit's so funny. Ritz says you're too good to be online, bro. Is that-",
+    "audio_features": {
+      "volume": {
+        "level": "loud",
+        "value": 387.25917271205356
+      },
+      "characteristics": {
+        "intensity": "normal",
+        "zero_crossing_rate": 0.14364299435053945,
+        "spectral_centroid": 1834.7515086213068
+      }
+    }
+  }
+]

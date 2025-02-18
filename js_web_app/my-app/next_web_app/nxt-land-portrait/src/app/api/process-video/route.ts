@@ -1,17 +1,10 @@
 // File: /src/app/api/process-video/route.ts
 import { NextResponse } from 'next/server';
 
-const SAMPLE_VIDEOS = [
-  "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
-  "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
-  "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
-  "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4"
-];
-
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { url } = body;
+    const { url, resolution } = body;
 
     if (!url) {
       return NextResponse.json(
@@ -20,14 +13,24 @@ export async function POST(req: Request) {
       );
     }
 
-    // Return the sample videos in the format expected by your frontend
-    return NextResponse.json({
-      success: true,
-      output: JSON.stringify({
-        videos: SAMPLE_VIDEOS
-      }),
-      message: 'Videos retrieved successfully'
+    // Forward the request to Flask backend
+    const flaskResponse = await fetch('http://localhost:5001/api/process-video', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ url, resolution }),
     });
+
+    if (!flaskResponse.ok) {
+      const errorData = await flaskResponse.json();
+      throw new Error(errorData.error || 'Failed to process video');
+    }
+
+    const data = await flaskResponse.json();
+    
+    // Pass through the Flask response directly
+    return NextResponse.json(data);
     
   } catch (error) {
     console.error('Error processing request:', error);

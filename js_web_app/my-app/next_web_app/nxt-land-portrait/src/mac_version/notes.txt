@@ -1,0 +1,1 @@
+1) the `p` has to be there when executing process_vid.py (e.g. 160p)
