@@ -5,19 +5,7 @@ import React, { useState, useEffect } from 'react';
 // Constants
 const FLASK_SERVER = 'http://localhost:5001';
 
-const RESOLUTIONS = [
-  { label: '1080p60', value: '1080p60' },
-  { label: '720p60', value: '720p60' },
-  { label: '720p', value: '720p' },
-  { label: '480p', value: '480p' },
-  { label: '360p', value: '360p' },
-  { label: 'Audio Only', value: 'audio' },
-  { label: '144p', value: '144p' },
-] as const;
-
 // Types
-type Resolution = typeof RESOLUTIONS[number]['value'];
-
 interface GeneratorState {
   isLoading: boolean;
   generatedVideos: string[];
@@ -35,16 +23,56 @@ interface ParsedOutput {
   script_output?: string;
 }
 
+interface VideoOptions {
+  qualities: string[];
+  raw_output: string;
+}
+
 const VideoClipGenerator: React.FC = () => {
   // State
   const [url, setUrl] = useState<string>('');
-  const [resolution, setResolution] = useState<Resolution>(RESOLUTIONS[0].value);
+  const [availableResolutions, setAvailableResolutions] = useState<string[]>([]);
+  const [resolution, setResolution] = useState<string>('');
+  const [isLoadingResolutions, setIsLoadingResolutions] = useState(false);
   const [state, setState] = useState<GeneratorState>({
     isLoading: false,
     generatedVideos: [],
     currentVideo: `${FLASK_SERVER}/video/sim.mp4`,
     videoExists: false
   });
+
+  // Fetch available resolutions when URL changes
+  useEffect(() => {
+    const fetchVideoOptions = async () => {
+      if (!url) return;
+      
+      setIsLoadingResolutions(true);
+      try {
+        const response = await fetch(`${FLASK_SERVER}/api/get-video-options`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch video options');
+        }
+
+        const data = await response.json() as { success: boolean; qualities: string[] };
+        if (data.success && data.qualities.length > 0) {
+          setAvailableResolutions(data.qualities);
+          setResolution(data.qualities[0]); // Set first available resolution as default
+        }
+      } catch (error) {
+        console.error('Error fetching video options:', error);
+        // alert('Failed to fetch available video qualities. Please try again.');
+      } finally {
+        setIsLoadingResolutions(false);
+      }
+    };
+
+    fetchVideoOptions();
+  }, [url]);
 
   // Video existence check
   useEffect(() => {
@@ -62,6 +90,13 @@ const VideoClipGenerator: React.FC = () => {
   }, [state.currentVideo]);
 
   // Handlers
+  const handleUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newUrl = e.target.value;
+    setUrl(newUrl);
+    setAvailableResolutions([]); // Reset resolutions when URL changes
+    setResolution(''); // Reset selected resolution
+  };
+
   const handleVideoSelect = async (videoUrl: string) => {
     try {
       const response = await fetch(videoUrl, { method: 'HEAD' });
@@ -80,6 +115,11 @@ const VideoClipGenerator: React.FC = () => {
   const handleGenerate = async (): Promise<void> => {
     if (!url) {
       alert('Please enter a video URL');
+      return;
+    }
+
+    if (!resolution) {
+      alert('Please select a resolution');
       return;
     }
 
@@ -141,50 +181,60 @@ const VideoClipGenerator: React.FC = () => {
             type="url"
             placeholder="Enter your video URL here"
             value={url}
-            onChange={(e) => setUrl(e.target.value)}
+            onChange={handleUrlChange}
             className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition-all duration-200"
           />
         </div>
 
-        <div className="space-y-2">
-          <label htmlFor="resolution" className="block text-sm font-medium text-gray-700">
-            Resolution
-          </label>
-          <select
-            id="resolution"
-            value={resolution}
-            onChange={(e) => setResolution(e.target.value as Resolution)}
-            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition-all duration-200 bg-white"
-          >
-            {RESOLUTIONS.map((res) => (
-              <option key={res.value} value={res.value}>
-                {res.label}
-              </option>
-            ))}
-          </select>
-        </div>
+        {isLoadingResolutions && (
+          <div className="flex justify-center">
+            <LoadingSpinner />
+          </div>
+        )}
 
-        <button
-          onClick={handleGenerate}
-          disabled={state.isLoading}
-          className={`
-            w-full py-3 px-6 rounded-lg font-medium text-white
-            transition-all duration-200
-            ${state.isLoading 
-              ? 'bg-gray-400 cursor-not-allowed'
-              : 'bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90 hover:shadow-lg'
-            }
-          `}
-        >
-          {state.isLoading ? (
-            <div className="flex items-center justify-center gap-2">
-              <LoadingSpinner />
-              <span>Processing...</span>
-            </div>
-          ) : (
-            'Process Video'
-          )}
-        </button>
+        {availableResolutions.length > 0 && (
+          <div className="space-y-2">
+            <label htmlFor="resolution" className="block text-sm font-medium text-gray-700">
+              Available Resolutions
+            </label>
+            <select
+              id="resolution"
+              value={resolution}
+              onChange={(e) => setResolution(e.target.value)}
+              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition-all duration-200 bg-white"
+            >
+              {availableResolutions.map((res) => (
+                <option key={res} value={res}>
+                  {res}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+
+        {availableResolutions.length > 0 && (
+          <button
+            onClick={handleGenerate}
+            disabled={state.isLoading}
+            className={`
+              w-full py-3 px-6 rounded-lg font-medium text-white
+              transition-all duration-200
+              ${state.isLoading 
+                ? 'bg-gray-400 cursor-not-allowed'
+                : 'bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90 hover:shadow-lg'
+              }
+            `}
+          >
+            {state.isLoading ? (
+              <div className="flex items-center justify-center gap-2">
+                <LoadingSpinner />
+                <span>Processing...</span>
+              </div>
+            ) : (
+              'Process Video'
+            )}
+          </button>
+        )}
       </div>
     </div>
   );
