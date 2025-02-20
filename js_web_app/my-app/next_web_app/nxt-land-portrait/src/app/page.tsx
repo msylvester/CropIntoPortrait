@@ -1,3 +1,5 @@
+// app/page.tsx
+/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client'
 
 import React from 'react';
@@ -6,7 +8,7 @@ import VideoPlayer from '@/components/VideoPlayer';
 
 const Page = () => {
   const FLASK_SERVER = 'http://localhost:5001';
-  const initialVideoPath = null;  // Changed from '' to null
+  const initialVideoPath = null;
 
   return (
     <div>
