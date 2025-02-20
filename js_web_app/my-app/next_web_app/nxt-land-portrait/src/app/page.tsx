@@ -6,7 +6,7 @@ import VideoPlayer from '@/components/VideoPlayer';
 
 const Page = () => {
   const FLASK_SERVER = 'http://localhost:5001';
-  const initialVideoPath = `${FLASK_SERVER}/video/sim.mp4`;
+  const initialVideoPath = null;  // Changed from '' to null
 
   return (
     <div>
