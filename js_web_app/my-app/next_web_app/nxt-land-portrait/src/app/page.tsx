@@ -5,7 +5,7 @@
 import React from 'react';
 import VideoClipGenerator from '@/components/VideoClipGenerator';
 import VideoPlayer from '@/components/VideoPlayer';
-
+import VidClipOG from '@/components/VidClipOG'
 const Page = () => {
   const FLASK_SERVER = 'http://localhost:5001';
   const initialVideoPath = null;
@@ -17,7 +17,7 @@ const Page = () => {
         title="Simulating the Human Race"
       />
       <div className="mt-8">
-        <VideoClipGenerator />
+        <VidClipOG />
       </div>
     </div>
   );
