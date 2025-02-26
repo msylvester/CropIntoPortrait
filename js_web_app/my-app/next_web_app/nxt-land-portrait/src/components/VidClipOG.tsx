@@ -3,16 +3,15 @@
 import React, { useState, useEffect } from 'react';
 import { InputSection } from './InputSection';
 
-// Constants
 const FLASK_SERVER = 'http://localhost:5001';
 
-// Types
 interface GeneratorState {
   isLoading: boolean;
   generatedVideos: string[];
   scriptOutput?: string;
   currentVideo?: string;
   videoExists: boolean;
+  currentProcessId?: string;
 }
 
 interface VideoProcessResponse {
@@ -22,25 +21,101 @@ interface VideoProcessResponse {
 interface ParsedOutput {
   videos?: string[];
   script_output?: string;
+  process_id?: string;
+}
+
+interface TaskResponse {
+  task_id: string;
+  status: string;
+  status_url: string;
+}
+
+interface TaskStatusResponse {
+  state: string;
+  success?: boolean;
+  qualities?: string[];
+  error?: string;
 }
 
 const VideoClipGenerator: React.FC = () => {
-  // State
   const [url, setUrl] = useState<string>('');
   const [availableResolutions, setAvailableResolutions] = useState<string[]>([]);
   const [resolution, setResolution] = useState<string>('');
   const [isLoadingResolutions, setIsLoadingResolutions] = useState(false);
+  const [resolutionTaskId, setResolutionTaskId] = useState<string | null>(null);
   const [state, setState] = useState<GeneratorState>({
     isLoading: false,
     generatedVideos: [],
     currentVideo: `${FLASK_SERVER}/video/sim.mp4`,
-    videoExists: false
+    videoExists: false,
+    currentProcessId: undefined
   });
 
-  // Fetch available resolutions when URL changes
+  useEffect(() => {
+    // Cancel any existing polling when the component unmounts
+    return () => {
+      if (resolutionTaskId) {
+        console.log('Cleaning up polling for task:', resolutionTaskId);
+      }
+    };
+  }, []);
+
+  // Poll for task status
+  useEffect(() => {
+    if (!resolutionTaskId) return;
+
+    let isMounted = true;
+    const pollInterval = setInterval(async () => {
+      try {
+        const response = await fetch(`${FLASK_SERVER}/api/task-status/${resolutionTaskId}`);
+        if (!response.ok) {
+          throw new Error('Failed to get task status');
+        }
+
+        const statusData = await response.json() as TaskStatusResponse;
+        console.log('Task status:', statusData);
+
+        if (!isMounted) return;
+
+        if (statusData.state === 'SUCCESS') {
+          clearInterval(pollInterval);
+          setResolutionTaskId(null);
+          
+          if (statusData.success && statusData.qualities && statusData.qualities.length > 0) {
+            setAvailableResolutions(statusData.qualities);
+            setResolution(statusData.qualities[0]);
+          }
+          setIsLoadingResolutions(false);
+        } else if (statusData.state === 'FAILURE') {
+          clearInterval(pollInterval);
+          setResolutionTaskId(null);
+          setIsLoadingResolutions(false);
+          console.error('Task failed:', statusData.error);
+        }
+        // For PENDING or other states, continue polling
+      } catch (error) {
+        console.error('Error polling task status:', error);
+        if (isMounted) {
+          clearInterval(pollInterval);
+          setResolutionTaskId(null);
+          setIsLoadingResolutions(false);
+        }
+      }
+    }, 1000); // Poll every second
+
+    return () => {
+      isMounted = false;
+      clearInterval(pollInterval);
+    };
+  }, [resolutionTaskId]);
+
   useEffect(() => {
     const fetchVideoOptions = async () => {
-      if (!url) return;
+      if (!url) {
+        setAvailableResolutions([]);
+        setResolution('');
+        return;
+      }
       
       setIsLoadingResolutions(true);
       try {
@@ -54,16 +129,15 @@ const VideoClipGenerator: React.FC = () => {
           throw new Error('Failed to fetch video options');
         }
 
-        const data = await response.json() as { success: boolean; qualities: string[] };
-        console.log('Received video options:', data);
+        // The response now contains a task ID instead of the actual data
+        const data = await response.json() as TaskResponse;
+        console.log('Received task response:', data);
         
-        if (data.success && data.qualities.length > 0) {
-          setAvailableResolutions(data.qualities);
-          setResolution(data.qualities[0]); // Set first available resolution as default
-        }
+        // Store the task ID to poll for its status
+        setResolutionTaskId(data.task_id);
+        
       } catch (error) {
         console.error('Error fetching video options:', error);
-      } finally {
         setIsLoadingResolutions(false);
       }
     };
@@ -71,7 +145,6 @@ const VideoClipGenerator: React.FC = () => {
     fetchVideoOptions();
   }, [url]);
 
-  // Video existence check
   useEffect(() => {
     const checkVideo = async () => {
       if (state.currentVideo) {
@@ -86,16 +159,8 @@ const VideoClipGenerator: React.FC = () => {
     checkVideo();
   }, [state.currentVideo]);
 
-  // Handlers
-  const handleUrlChange = (newUrl: string) => {
+  const handleUrlChange = (newUrl: string): void => {
     setUrl(newUrl);
-    setAvailableResolutions([]); // Reset resolutions when URL changes
-    setResolution(''); // Reset selected resolution
-  };
-
-  const handleCancelDownload = async () => {
-    // Implement cancel functionality if needed
-    console.log('Cancel download requested');
   };
 
   const handleVideoSelect = async (videoUrl: string) => {
@@ -112,7 +177,42 @@ const VideoClipGenerator: React.FC = () => {
       console.error('Error checking video:', error);
     }
   };
+  
+  const handleCancelDownload = async (): Promise<void> => {
+    try {
+      console.log('Attempting to cancel process:', state.currentProcessId);
+      
+      if (!state.currentProcessId) {
+        console.warn('No active process to cancel');
+        return;
+      }
 
+      console.log('Sending cancel request for process:', state.currentProcessId);
+      
+      const response = await fetch(
+        `${FLASK_SERVER}/api/cancel-process/${state.currentProcessId}`,
+        { method: 'POST' }
+      );
+
+      const responseData = await response.json();
+      console.log('Cancel response:', responseData);
+
+      if (!response.ok) {
+        throw new Error(responseData.error || 'Failed to cancel processing');
+      }
+
+      setState(prev => ({
+        ...prev,
+        isLoading: false,
+        currentProcessId: undefined
+      }));
+
+    } catch (error) {
+      console.error('Error cancelling download:', error);
+      alert('Failed to cancel the download. Please try again.');
+    }
+  };
+  
   const handleGenerate = async (): Promise<void> => {
     if (!url) {
       alert('Please enter a video URL');
@@ -139,8 +239,22 @@ const VideoClipGenerator: React.FC = () => {
       }
 
       const { output } = await response.json() as VideoProcessResponse;
+      console.log('Process response output:', output);
+      
       const parsedOutput = JSON.parse(output) as ParsedOutput;
+      console.log('Parsed output:', parsedOutput);
+      
       const newVideos = parsedOutput.videos || [];
+      const processId = parsedOutput.process_id;
+      
+      console.log('Process ID received:', processId);
+
+      if (processId) {
+        setState(prev => ({
+          ...prev,
+          currentProcessId: processId
+        }));
+      }
 
       if (newVideos.length > 0) {
         try {
@@ -151,7 +265,7 @@ const VideoClipGenerator: React.FC = () => {
             scriptOutput: parsedOutput.script_output || '',
             currentVideo: videoCheck.ok ? newVideos[0] : prev.currentVideo,
             videoExists: videoCheck.ok,
-            isLoading: false,
+            isLoading: false
           }));
         } catch (error) {
           console.error('Error checking video:', error);
