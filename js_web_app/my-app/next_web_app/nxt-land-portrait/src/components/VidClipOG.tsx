@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { InputSection } from './InputSection';
 
 const FLASK_SERVER = 'http://localhost:5001';
+const FIXED_UUID = 'msylvest'; // Updated the UUID to match your directory structure
 
 interface GeneratorState {
   isLoading: boolean;
@@ -11,30 +12,25 @@ interface GeneratorState {
   scriptOutput?: string;
   currentVideo?: string;
   videoExists: boolean;
-  currentProcessId?: string;
-}
-
-interface VideoProcessResponse {
-  output: string;
-}
-
-interface ParsedOutput {
-  videos?: string[];
-  script_output?: string;
-  process_id?: string;
+  currentTaskId?: string;
 }
 
 interface TaskResponse {
   task_id: string;
   status: string;
   status_url: string;
+  uuid?: string;
 }
 
 interface TaskStatusResponse {
   state: string;
   success?: boolean;
   qualities?: string[];
+  videos?: string[];
+  script_output?: string;
   error?: string;
+  uuid?: string;
+  video_id?: string;
 }
 
 const VideoClipGenerator: React.FC = () => {
@@ -48,19 +44,10 @@ const VideoClipGenerator: React.FC = () => {
     generatedVideos: [],
     currentVideo: `${FLASK_SERVER}/video/sim.mp4`,
     videoExists: false,
-    currentProcessId: undefined
+    currentTaskId: undefined
   });
 
-  useEffect(() => {
-    // Cancel any existing polling when the component unmounts
-    return () => {
-      if (resolutionTaskId) {
-        console.log('Cleaning up polling for task:', resolutionTaskId);
-      }
-    };
-  }, []);
-
-  // Poll for task status
+  // Poll for resolution task status
   useEffect(() => {
     if (!resolutionTaskId) return;
 
@@ -73,7 +60,7 @@ const VideoClipGenerator: React.FC = () => {
         }
 
         const statusData = await response.json() as TaskStatusResponse;
-        console.log('Task status:', statusData);
+        console.log('Resolution task status:', statusData);
 
         if (!isMounted) return;
 
@@ -108,6 +95,91 @@ const VideoClipGenerator: React.FC = () => {
       clearInterval(pollInterval);
     };
   }, [resolutionTaskId]);
+
+  // Poll for video processing task status
+  useEffect(() => {
+    if (!state.currentTaskId) return;
+
+    let isMounted = true;
+    const pollInterval = setInterval(async () => {
+      try {
+        const response = await fetch(`${FLASK_SERVER}/api/task-status/${state.currentTaskId}`);
+        if (!response.ok) {
+          throw new Error('Failed to get task status');
+        }
+
+        const statusData = await response.json() as TaskStatusResponse;
+        console.log('Process task status:', statusData);
+
+        if (!isMounted) return;
+
+        if (statusData.state === 'SUCCESS') {
+          clearInterval(pollInterval);
+          
+          if (statusData.success && statusData.videos && statusData.videos.length > 0) {
+            try {
+              // Do a HEAD request to check if the video exists
+              const videoCheck = await fetch(statusData.videos[0], { method: 'HEAD' });
+              
+              if (videoCheck.ok) {
+                console.log("Video exists and is accessible!");
+              } else {
+                console.warn("Video responded with status:", videoCheck.status);
+              }
+              
+              setState(prev => ({
+                ...prev,
+                isLoading: false,
+                currentTaskId: undefined,
+                generatedVideos: statusData.videos,
+                scriptOutput: statusData.script_output || '',
+                currentVideo: videoCheck.ok ? statusData.videos[0] : prev.currentVideo,
+                videoExists: videoCheck.ok
+              }));
+            } catch (error) {
+              console.error('Error checking video:', error);
+              setState(prev => ({ 
+                ...prev, 
+                isLoading: false,
+                currentTaskId: undefined 
+              }));
+            }
+          } else {
+            setState(prev => ({ 
+              ...prev, 
+              isLoading: false,
+              currentTaskId: undefined 
+            }));
+          }
+        } else if (statusData.state === 'FAILURE') {
+          clearInterval(pollInterval);
+          console.error('Task failed:', statusData.error);
+          alert(statusData.error || 'Failed to process video');
+          setState(prev => ({ 
+            ...prev, 
+            isLoading: false,
+            currentTaskId: undefined 
+          }));
+        }
+        // For PENDING or other states, continue polling
+      } catch (error) {
+        console.error('Error polling task status:', error);
+        if (isMounted) {
+          clearInterval(pollInterval);
+          setState(prev => ({ 
+            ...prev, 
+            isLoading: false,
+            currentTaskId: undefined 
+          }));
+        }
+      }
+    }, 1000); // Poll every second
+
+    return () => {
+      isMounted = false;
+      clearInterval(pollInterval);
+    };
+  }, [state.currentTaskId]);
 
   useEffect(() => {
     const fetchVideoOptions = async () => {
@@ -172,6 +244,8 @@ const VideoClipGenerator: React.FC = () => {
           currentVideo: videoUrl,
           videoExists: true
         }));
+      } else {
+        console.warn(`Video not accessible: ${videoUrl} returned status ${response.status}`);
       }
     } catch (error) {
       console.error('Error checking video:', error);
@@ -180,17 +254,17 @@ const VideoClipGenerator: React.FC = () => {
   
   const handleCancelDownload = async (): Promise<void> => {
     try {
-      console.log('Attempting to cancel process:', state.currentProcessId);
+      console.log('Attempting to cancel task:', state.currentTaskId);
       
-      if (!state.currentProcessId) {
-        console.warn('No active process to cancel');
+      if (!state.currentTaskId) {
+        console.warn('No active task to cancel');
         return;
       }
 
-      console.log('Sending cancel request for process:', state.currentProcessId);
+      console.log('Sending cancel request for task:', state.currentTaskId);
       
       const response = await fetch(
-        `${FLASK_SERVER}/api/cancel-process/${state.currentProcessId}`,
+        `${FLASK_SERVER}/api/cancel-process/${state.currentTaskId}`,
         { method: 'POST' }
       );
 
@@ -204,7 +278,7 @@ const VideoClipGenerator: React.FC = () => {
       setState(prev => ({
         ...prev,
         isLoading: false,
-        currentProcessId: undefined
+        currentTaskId: undefined
       }));
 
     } catch (error) {
@@ -230,7 +304,11 @@ const VideoClipGenerator: React.FC = () => {
       const response = await fetch(`${FLASK_SERVER}/api/process-video`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url, resolution }),
+        body: JSON.stringify({ 
+          url, 
+          resolution,
+          uuid: FIXED_UUID // Include the fixed UUID in every request
+        }),
       });
 
       if (!response.ok) {
@@ -238,40 +316,16 @@ const VideoClipGenerator: React.FC = () => {
         throw new Error(errorData.error || 'Failed to process video');
       }
 
-      const { output } = await response.json() as VideoProcessResponse;
-      console.log('Process response output:', output);
+      // The response now contains a task ID
+      const data = await response.json() as TaskResponse;
+      console.log('Process task response:', data);
       
-      const parsedOutput = JSON.parse(output) as ParsedOutput;
-      console.log('Parsed output:', parsedOutput);
-      
-      const newVideos = parsedOutput.videos || [];
-      const processId = parsedOutput.process_id;
-      
-      console.log('Process ID received:', processId);
+      // Store the task ID to poll for status
+      setState(prev => ({
+        ...prev,
+        currentTaskId: data.task_id
+      }));
 
-      if (processId) {
-        setState(prev => ({
-          ...prev,
-          currentProcessId: processId
-        }));
-      }
-
-      if (newVideos.length > 0) {
-        try {
-          const videoCheck = await fetch(newVideos[0], { method: 'HEAD' });
-          setState(prev => ({
-            ...prev,
-            generatedVideos: newVideos,
-            scriptOutput: parsedOutput.script_output || '',
-            currentVideo: videoCheck.ok ? newVideos[0] : prev.currentVideo,
-            videoExists: videoCheck.ok,
-            isLoading: false
-          }));
-        } catch (error) {
-          console.error('Error checking video:', error);
-          setState(prev => ({ ...prev, isLoading: false }));
-        }
-      }
     } catch (error) {
       console.error('Error processing video:', error);
       alert(error instanceof Error ? error.message : 'Failed to process video. Please try again.');
