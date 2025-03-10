@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react';
 import { InputSection } from './InputSection';
 import VideoPlayer from './VideoPlayer'; // Import correctly with default export
 import GeneratedVideosGrid from './GeneratedVideosGrid';
-import { LoadingSpinner } from './LoadingSpinner'; // Import the abstracted LoadingSpinner
 
 
 const FLASK_SERVER = 'http://localhost:5001';
