@@ -2,6 +2,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { InputSection } from './InputSection';
+import VideoPlayer from './VideoPlayer'; // Import correctly with default export
+import GeneratedVideosGrid from './GeneratedVideosGrid';
+import { LoadingSpinner } from './LoadingSpinner'; // Import the abstracted LoadingSpinner
+
 
 const FLASK_SERVER = 'http://localhost:5001';
 const FIXED_UUID = 'msylvest'; // Updated the UUID to match your directory structure
@@ -332,35 +336,7 @@ const VideoClipGenerator: React.FC = () => {
       setState(prev => ({ ...prev, isLoading: false }));
     }
   };
-
-
-  const VideoPlayer = () => (
-    state.videoExists && (
-      <div className="bg-white bg-opacity-95 backdrop-blur-sm rounded-2xl shadow-xl p-8 w-full">
-        <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center">
-          Video Player
-        </h1>
-        
-        <div className="aspect-video rounded-lg overflow-hidden shadow-xl">
-          <video
-            controls
-            className="w-full h-full"
-            autoPlay={false}
-            preload="metadata"
-            key={state.currentVideo}
-          >
-            <source src={state.currentVideo} type="video/mp4" />
-            Your browser does not support the video tag.
-          </video>
-        </div>
-        
-        <div className="mt-4 text-sm text-gray-600">
-          <p>Currently playing: {state.currentVideo?.split('/').pop()}</p>
-        </div>
-      </div>
-    )
-  );
-
+/*
   const GeneratedVideosGrid = () => (
     state.generatedVideos.length > 0 && (
       <div className="bg-white bg-opacity-95 backdrop-blur-sm rounded-2xl shadow-xl p-8">
@@ -388,8 +364,7 @@ const VideoClipGenerator: React.FC = () => {
         </div>
       </div>
     )
-  );
-
+  );*/
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 p-4">
       <div className="max-w-6xl mx-auto space-y-8">
@@ -404,8 +379,11 @@ const VideoClipGenerator: React.FC = () => {
           onCancelDownload={handleCancelDownload}
           isLoading={state.isLoading}
         />
-        <VideoPlayer />
-        <GeneratedVideosGrid />
+        {state.currentVideo && <VideoPlayer videoPath={state.currentVideo} />}
+        {state.generatedVideos && <GeneratedVideosGrid videos={state.generatedVideos} onVideoSelect={handleVideoSelect}/>} 
+
+
+        {/*       <GeneratedVideosGrid /> */}
       </div>
     </div>
   );

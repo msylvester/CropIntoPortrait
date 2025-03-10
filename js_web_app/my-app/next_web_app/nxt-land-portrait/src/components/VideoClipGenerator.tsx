@@ -4,7 +4,26 @@ import React, { useState, useEffect } from 'react';
 import { InputSection } from './InputSection';
 import { VideoPlayerSection } from './VideoPlayerSection';
 import { GeneratedVideosGrid } from './GeneratedVideosGrid';
-import { GeneratorState, VideoProcessResponse, ParsedOutput } from './types';
+
+// Type definitions
+export interface GeneratorState {
+  isLoading: boolean;
+  generatedVideos: string[];
+  currentVideo: string;
+  videoExists: boolean;
+  currentProcessId?: string;
+  scriptOutput?: string;
+}
+
+export interface VideoProcessResponse {
+  output: string;
+}
+
+export interface ParsedOutput {
+  videos?: string[];
+  script_output?: string;
+  process_id?: string;
+}
 
 const FLASK_SERVER = 'http://localhost:5001';
 
@@ -17,73 +36,104 @@ const VideoClipGenerator: React.FC = () => {
     isLoading: false,
     generatedVideos: [],
     currentVideo: `${FLASK_SERVER}/video/sim.mp4`,
-    videoExists: false
+    videoExists: false,
+    currentProcessId: undefined
   });
 
+  // Effect to fetch available resolutions when URL changes
   useEffect(() => {
-    const fetchVideoOptions = async () => {
-      if (!url) return;
-      
+    const fetchResolutions = async () => {
+      if (!url) {
+        console.log('No URL provided, clearing resolutions');
+        setAvailableResolutions([]);
+        setResolution('');
+        return;
+      }
+
+      console.log('Fetching resolutions for URL:', url);
       setIsLoadingResolutions(true);
+
       try {
+        console.log('Fetching resolutions for URL:', url);
+        console.log('Sending request to:', `${FLASK_SERVER}/api/get-video-options`);
+        
         const response = await fetch(`${FLASK_SERVER}/api/get-video-options`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
           body: JSON.stringify({ url }),
+          // Adding credentials if needed
+          credentials: 'include'
         });
 
         if (!response.ok) {
-          throw new Error('Failed to fetch video options');
+          throw new Error('Failed to fetch resolutions');
         }
 
-        const data = await response.json() as { success: boolean; qualities: string[] };
-        if (data.success && data.qualities.length > 0) {
-          setAvailableResolutions(data.qualities);
-          setResolution(data.qualities[0]);
+        const data = await response.json();
+        setAvailableResolutions(data.resolutions || []);
+        
+        // Set default resolution if available
+        if (data.resolutions && data.resolutions.length > 0) {
+          setResolution(data.resolutions[0]);
         }
       } catch (error) {
-        console.error('Error fetching video options:', error);
+        console.error('Error fetching resolutions:', error);
+        if (error instanceof TypeError && error.message === 'Failed to fetch') {
+          console.error('Network error - Is the Flask server running on port 5001?');
+          alert('Unable to connect to the server. Please make sure the backend server is running.');
+        }
+        setAvailableResolutions([]);
+        setResolution('');
       } finally {
         setIsLoadingResolutions(false);
       }
     };
 
-    fetchVideoOptions();
+    fetchResolutions();
   }, [url]);
 
-  useEffect(() => {
-    const checkVideo = async () => {
-      if (state.currentVideo) {
-        try {
-          const response = await fetch(state.currentVideo, { method: 'HEAD' });
-          setState(prev => ({ ...prev, videoExists: response.ok }));
-        } catch (error) {
-          setState(prev => ({ ...prev, videoExists: false }));
-        }
-      }
-    };
-    checkVideo();
-  }, [state.currentVideo]);
-
-  const handleUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newUrl = e.target.value;
-    setUrl(newUrl);
-    setAvailableResolutions([]);
-    setResolution('');
+  const handleUrlChange = (url: string): void => {
+    setUrl(url);
   };
 
-  const handleVideoSelect = async (videoUrl: string) => {
+  const handleVideoSelect = (videoUrl: string): void => {
+    setState(prev => ({
+      ...prev,
+      currentVideo: videoUrl,
+      videoExists: true
+    }));
+  };
+
+  const handleCancelDownload = async (): Promise<void> => {
     try {
-      const response = await fetch(videoUrl, { method: 'HEAD' });
-      if (response.ok) {
-        setState(prev => ({
-          ...prev,
-          currentVideo: videoUrl,
-          videoExists: true
-        }));
+      if (!state.currentProcessId) {
+        console.warn('No active process to cancel');
+        return;
       }
+
+      const response = await fetch(
+        `${FLASK_SERVER}/api/cancel-processing/${state.currentProcessId}`,
+        { method: 'POST' }
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to cancel processing');
+      }
+
+      // Clean up temporary files
+      await fetch(`${FLASK_SERVER}/api/cleanup-temp-files`, { method: 'POST' });
+
+      setState(prev => ({
+        ...prev,
+        isLoading: false,
+        currentProcessId: undefined
+      }));
     } catch (error) {
-      console.error('Error checking video:', error);
+      console.error('Error cancelling download:', error);
+      alert('Failed to cancel the download. Please try again.');
     }
   };
 
@@ -126,6 +176,7 @@ const VideoClipGenerator: React.FC = () => {
             currentVideo: videoCheck.ok ? newVideos[0] : prev.currentVideo,
             videoExists: videoCheck.ok,
             isLoading: false,
+            currentProcessId: parsedOutput.process_id
           }));
         } catch (error) {
           console.error('Error checking video:', error);
@@ -150,6 +201,7 @@ const VideoClipGenerator: React.FC = () => {
           resolution={resolution}
           onResolutionChange={setResolution}
           onGenerate={handleGenerate}
+          onCancelDownload={handleCancelDownload}
           isLoading={state.isLoading}
         />
         <VideoPlayerSection

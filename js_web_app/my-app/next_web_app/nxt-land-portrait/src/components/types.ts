@@ -5,6 +5,7 @@ export interface GeneratorState {
   scriptOutput?: string;
   currentVideo?: string;
   videoExists: boolean;
+  currentProcessId?: string;  // Added this line
 }
 
 export interface VideoProcessResponse {
@@ -14,6 +15,7 @@ export interface VideoProcessResponse {
 export interface ParsedOutput {
   videos?: string[];
   script_output?: string;
+  process_id?: string;  // Added this line
 }
 
 export interface InputSectionProps {
@@ -24,7 +26,7 @@ export interface InputSectionProps {
   resolution: string;
   onResolutionChange: (value: string) => void;
   onGenerate: () => Promise<void>;
-  onCancelDownload?: () => void;  // Added new prop
+  onCancelDownload: () => Promise<void>;  // Changed to required and async
   isLoading: boolean;
 }
 

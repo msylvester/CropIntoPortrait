@@ -26,6 +26,7 @@ export const InputSection: React.FC<InputSectionProps> = ({
 }) => {
   const handleCancel = async (e: React.MouseEvent) => {
     e.preventDefault();
+    //alert('hello')
     await onCancelDownload();
   };
 
