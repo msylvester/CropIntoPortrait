@@ -335,37 +335,9 @@ const VideoClipGenerator: React.FC = () => {
       setState(prev => ({ ...prev, isLoading: false }));
     }
   };
-/*
-  const GeneratedVideosGrid = () => (
-    state.generatedVideos.length > 0 && (
-      <div className="bg-white bg-opacity-95 backdrop-blur-sm rounded-2xl shadow-xl p-8">
-        <h2 className="text-2xl font-bold text-gray-800 mb-6">
-          Generated Clips
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {state.generatedVideos.map((videoUrl, index) => (
-            <div 
-              key={index} 
-              className="space-y-2 cursor-pointer" 
-              onClick={() => handleVideoSelect(videoUrl)}
-            >
-              <div className="rounded-lg overflow-hidden shadow-lg">
-                <video className="w-full aspect-video" preload="metadata">
-                  <source src={videoUrl} type="video/mp4" />
-                  Your browser does not support the video tag.
-                </video>
-              </div>
-              <div className="text-sm text-gray-600 break-all">
-                Clip {index + 1}: {videoUrl.split('/').pop()}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    )
-  );*/
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 p-4">
+
+  return (        
+    <div className="bg-black p4">
       <div className="max-w-6xl mx-auto space-y-8">
         <InputSection
           url={url}
@@ -380,9 +352,6 @@ const VideoClipGenerator: React.FC = () => {
         />
         {state.currentVideo && <VideoPlayer videoPath={state.currentVideo} />}
         {state.generatedVideos && <GeneratedVideosGrid videos={state.generatedVideos} onVideoSelect={handleVideoSelect}/>} 
-
-
-        {/*       <GeneratedVideosGrid /> */}
       </div>
     </div>
   );
